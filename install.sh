@@ -6,6 +6,20 @@
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+TARGET_DIR="$HOME/.claude/skills/novel-polish"
+
+# 如果当前位置不是目标位置，先移过去再重新执行
+if [ "$REPO_DIR" != "$TARGET_DIR" ]; then
+  echo "→ 当前路径：$REPO_DIR"
+  echo "→ 移动到：$TARGET_DIR"
+  mkdir -p "$(dirname "$TARGET_DIR")"
+  if [ -d "$TARGET_DIR" ]; then
+    rm -rf "$TARGET_DIR"
+  fi
+  mv "$REPO_DIR" "$TARGET_DIR"
+  exec bash "$TARGET_DIR/install.sh"
+fi
+
 SKILLS_DIR="$(dirname "$REPO_DIR")"
 
 count=0
