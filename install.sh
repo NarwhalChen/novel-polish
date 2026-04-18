@@ -1,23 +1,22 @@
 #!/bin/bash
-# 将 novel-polish commands 链接到目标小说项目
-# 用法：./install.sh /path/to/my-novel
+# 全局安装 novel-polish 到 ~/.claude/commands/
+# 用法：./install.sh
+# 之后任意项目目录均可使用 /novel-* 命令
 
-NOVEL_DIR="${1:-.}"
 COMMANDS_SRC="$(cd "$(dirname "$0")/commands" && pwd)"
-COMMANDS_DST="$NOVEL_DIR/.claude/commands"
+COMMANDS_DST="$HOME/.claude/commands"
 
-if [ ! -d "$NOVEL_DIR" ]; then
-  echo "✗ 目录不存在：$NOVEL_DIR"
-  exit 1
-fi
+mkdir -p "$COMMANDS_DST"
 
-mkdir -p "$NOVEL_DIR/.claude"
+count=0
+for f in "$COMMANDS_SRC"/*.md; do
+  name="$(basename "$f")"
+  ln -sf "$f" "$COMMANDS_DST/$name"
+  echo "  ✓ $name"
+  count=$((count + 1))
+done
 
-if [ -L "$COMMANDS_DST" ]; then
-  echo "⚠ 已有 symlink：$COMMANDS_DST，覆盖..."
-  rm "$COMMANDS_DST"
-fi
-
-ln -sf "$COMMANDS_SRC" "$COMMANDS_DST"
-echo "✓ 已链接：$COMMANDS_DST → $COMMANDS_SRC"
-echo "  进入小说目录运行 /novel-init <标题> 开始"
+echo ""
+echo "✓ 安装完成（$count 个命令 → $COMMANDS_DST）"
+echo "  更新：cd $(dirname "$0") && git pull（symlink 自动生效）"
+echo "  使用：进入任意小说目录，运行 /novel-init <标题>"
